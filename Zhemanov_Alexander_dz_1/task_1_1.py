@@ -13,19 +13,25 @@ try:
 
     sec = int(in_sec_str)
 
+    # if sec < 0
+    num_sign = 1
+    if sec < 0:
+        sec = abs(sec)
+        num_sign = -1
+
     if sec >= SEC_IN_DAY:
-        output_msg += str(sec // SEC_IN_DAY) + " дн "
+        output_msg += str(num_sign * (sec // SEC_IN_DAY)) + " дн "
         sec %= SEC_IN_DAY
 
     if sec >= SEC_IN_HOUR:
-        output_msg += str(sec // SEC_IN_HOUR) + " час "
+        output_msg += str(num_sign * (sec // SEC_IN_HOUR)) + " час "
         sec %= SEC_IN_HOUR
 
     if sec >= SEC_IN_MINUTE:
-        output_msg += str(sec // SEC_IN_MINUTE) + " мин "
+        output_msg += str(num_sign * (sec // SEC_IN_MINUTE)) + " мин "
         sec %= SEC_IN_MINUTE
 
-    output_msg += str(sec) + " сек"
+    output_msg += str(num_sign * sec) + " сек"
     print(output_msg)
 
 except ValueError:
