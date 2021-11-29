@@ -22,7 +22,7 @@ sum_without_17:int = 0
 for elem in list_of_odd:
 
     cube = elem ** 3
-    cube_with_17 = (elem + 17) ** 3
+    cube_with_17 = cube + 17
 
     if sum_of_num(cube) % 7 == 0:
         sum_without_17 += cube
