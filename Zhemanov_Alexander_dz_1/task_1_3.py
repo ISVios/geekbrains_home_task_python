@@ -7,10 +7,7 @@ phrase_without_end: str = "процент"
 for i in range(1, 100 + 1):
     # exceptions + 5 - 9 end
     if (i % 10 == 0 or
-            i == 11 or
-            i == 12 or
-            i == 13 or
-            i == 14 or
+            11 <= i >= 14 or
             5 <= i % 10 <= 9):
         print(i, phrase_without_end + "ов")
     elif 2 <= i % 10 < 5:
