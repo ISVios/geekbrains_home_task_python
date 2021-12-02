@@ -16,14 +16,14 @@ for _ in range(length_of_list):  # pyright change i to _
     elem = input_list.pop(0)
 
     # no nessary use isalnum in here but I use
-    if elem.count(".") == 0 and elem.isdigit() and elem.isalnum():
+    if  elem.isdigit() and elem.isalnum():
         input_list.append(f'"{int(elem):02d}"')
         # or   ['"', "00", '"']
         # input_list.append('"')
         # input_list.append(f'{int(elem):02d}')
         # input_list.append('"')
 
-    elif elem.count(".") == 0 and elem[0] == "+" and elem[1].isdigit():
+    elif elem[0] == "+" and elem[1].isdigit():
         input_list.append(f'"+{int(elem):02d}"')
         # or   ['"', "+00", '"']
         # input_list.append('"')
