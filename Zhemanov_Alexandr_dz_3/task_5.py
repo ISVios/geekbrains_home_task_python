@@ -26,8 +26,8 @@ def get_jokes(count, unique=False):
 
     # if we used unique flag need protect
 
-    if unique and count < len([*nouns, *adverbs, *adjectives]):
-        return []
+    if unique and count > max(map(len,[nouns, adverbs, adjectives])):
+        return get_jokes(5, True)
 
     for _ in range(count):
 
