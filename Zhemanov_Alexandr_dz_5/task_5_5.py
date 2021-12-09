@@ -16,7 +16,8 @@ def my_set(*argv):
         else:
             answ.remove(elem)
 
-    return [x for x in argv if x in answ]  # best
+    #return (x for x in argv if x in answ)  # best
+    return [x for x in argv if x in answ]  # better
     # return [ x for x in argv if argv.count(x) == 1 ] # worst
     # return [ x for i, x in enumerate(argv) if not x in [*argv[:i], *argv[i+1:]] ] # bad
 
@@ -34,5 +35,3 @@ if __name__ == "__main__":
 
     print(r == result)
     print(r)
-
-    print(test_set(*src))
