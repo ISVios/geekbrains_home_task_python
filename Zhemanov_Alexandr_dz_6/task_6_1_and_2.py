@@ -2,10 +2,13 @@
 
 """ task 1 2 """
 
-def parse_log(pth_file):
+
+# task 1
+
+def parse_log(pth_file="./nginx_logs.txt"):
 
     if pth_file:
-        with open(pth_file,"r",encoding="utf-8") as file:
+        with open(pth_file, "r", encoding="utf-8") as file:
             for line in file:
                 ip = line.split(" - - ")[0]
                 rsp_and_pth = line.split('"')[1]
@@ -14,24 +17,41 @@ def parse_log(pth_file):
                 yield(ip, rsp, pth)
 
 
-def find_spamer(parsed_log):
-    
-    if not parsed_log:
+# task 2
+
+def find_spamer(pth_file="./nginx_logs.txt"):
+
+    if not pth_file:
         return None
-    
+
+    parsed = parse_log(pth_file)
+
     db = {}
 
-    for log in  parsed_log:
-        if not db.get(log[0]):
-            db[log[0]] = {"count":1, "files":set([log[2]])}
-        else:
-            db[log[0]]["count"] += 1
-            db[log[0]]["files"].add(log[2])
+    for log in parsed:
 
-    return max(db.items(), key=lambda x: x[1]["count"])
+        db[log[0]] = db.get(log[0], 0) + 1
+
+    return max(db.items(), key=lambda x: x[1])
+
+    #    if not db.get(log[0]):
+    #        db[log[0]] = {"count": 1, "files": set([log[2]])}
+    #    else:
+    #        db[log[0]]["count"] += 1
+    #        db[log[0]]["files"].add(log[2])
+
+    #return max(db.items(), key=lambda x: x[1]["count"])
 
 
 if __name__ == "__main__":
-   parsed_log = parse_log("./nginx_logs.txt")
-   spamer = find_spamer(parsed_log) 
-   
+    parsed = parse_log()
+    
+    print(type(parsed))
+
+    for _ in range(5):
+        print(next(parsed))
+
+    spamer = find_spamer()
+    if spamer:
+        print(f"ip spamer: {spamer[0]}, count: {spamer[1]}")
+
