@@ -34,14 +34,6 @@ def find_spamer(pth_file="./nginx_logs.txt"):
 
     return max(db.items(), key=lambda x: x[1])
 
-    #    if not db.get(log[0]):
-    #        db[log[0]] = {"count": 1, "files": set([log[2]])}
-    #    else:
-    #        db[log[0]]["count"] += 1
-    #        db[log[0]]["files"].add(log[2])
-
-    #return max(db.items(), key=lambda x: x[1]["count"])
-
 
 if __name__ == "__main__":
     parsed = parse_log()
