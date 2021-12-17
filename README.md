@@ -7,3 +7,4 @@ Git repo for home work
 - [Home Work 4](https://github.com/ISVios/geekbrains_home_task_python/pull/9)
 - [Home Work 5](https://github.com/ISVios/geekbrains_home_task_python/pull/10)
 - [Home Work 6](https://github.com/ISVios/geekbrains_home_task_python/pull/11)
+- [Home Work 7](https://github.com/ISVios/geekbrains_home_task_python/pull/14)
