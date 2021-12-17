@@ -1,38 +1,29 @@
 #!/usr/bin/env python3
 
 
-""" task 5 """
+""" task 4 """
 
 import os
 import sys
+import time
 
 size = {}
 
 
 def scan_mem(pth):
 
-    if not os.path.exists(pth):
-        return
+    for root, _, files in os.walk(pth):
+        for file in files:
+            correct_file = os.path.join(root, file)
+            mem = 10 ** len(str(os.stat(correct_file).st_size))
+            file_extend = os.path.splitext(file)[-1]
+            count, extends = size.get(mem, (0, set()))
 
-    with os.scandir(pth) as files:
+            extends.add(file_extend)
+            count += 1
 
-        for node in files:
+            size[mem] = (count, extends)
 
-            if node.is_file():
-
-                mem = 10 ** len(str(os.stat(node).st_size))
-
-                file_extend = os.path.splitext(node)[-1]
-
-                count, extends = size.get(mem, (0, set()))
-
-                extends.add(file_extend)
-                count += 1
-
-                size[mem] = (count, extends)
-
-            elif node.is_dir():
-                scan_mem(os.path.join(pth, node))
 
 
 if __name__ == "__main__":
@@ -43,7 +34,6 @@ if __name__ == "__main__":
         pth = os.getcwd()
 
     scan_mem(pth)
-    print({ k:(size[k][0], list(size[k][1])) for k in size})
-
+    print({ k:(v[0], list(v[1])) for k, v in size.items()})
 
 
