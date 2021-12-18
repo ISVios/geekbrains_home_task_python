@@ -4,18 +4,19 @@
 
 # BNF config yaml
 #
-# LANG  = NODES...
+# LANG  = NODES..
 # NODES = ["\t"..] ( FILE | DIR )
-# FILE  = NAME ".py\n"
+# FILE  = NAME "." EXT "\n"
 # DIR   = NAME ":\n"
-# NAME  = char [ char | num ]
+# NAME  = char [ char | num ]..
+# EXT   = ( char | num )..
 
 
 def make_project(glb_tab, stryct, root):
 
     if glb_tab != -1 and not os.path.exists(root):
         os.mkdir(root)
-    print(f"make folder {root}")
+    #print(f"make folder {root}")
     os.chdir(root)
     n_stryct = []
     inside_dir = None
@@ -23,13 +24,13 @@ def make_project(glb_tab, stryct, root):
 
         if inside_dir:
             if inside_dir[1] < line_tab:
-                print(f"in {inside_dir[0]} {node_name}")
+                #print(f"in {inside_dir[0]} {node_name}")
                 n_stryct.append((node_name, line_tab, is_dir))
                 if i == len(stryct) - 1:
                     make_project(inside_dir[1], n_stryct,
                                  os.path.join(root, inside_dir[0]))
             elif inside_dir[1] == line_tab and is_dir:
-                print(f"put stack in {inside_dir[0]} in {root}")
+                #print(f"put stack in {inside_dir[0]} in {root}")
                 make_project(inside_dir[1], n_stryct,
                              os.path.join(root, inside_dir[0]))
                 os.chdir(root)
@@ -37,7 +38,7 @@ def make_project(glb_tab, stryct, root):
                 n_stryct = []
 
             else:
-                print(f"make folder {inside_dir[0]}")
+                #print(f"make folder {inside_dir[0]}")
 
                 if not is_dir:
                     n_stryct.append((node_name, line_tab, is_dir))
@@ -48,11 +49,11 @@ def make_project(glb_tab, stryct, root):
                 inside_dir = (node_name, line_tab) if is_dir else None
 
         elif is_dir:
-            print(f"find dir {node_name}")
+            #print(f"find dir {node_name}")
             inside_dir = (node_name, line_tab)
         else:
             open(node_name, "a").close()
-            print(f"create file {node_name} in {root}")
+            #print(f"create file {node_name} in {root}")
 
 
 if __name__ == "__main__":
