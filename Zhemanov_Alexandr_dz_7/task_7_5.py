@@ -15,7 +15,7 @@ def scan_mem(pth):
     for root, _, files in os.walk(pth):
         for file in files:
             correct_file = os.path.join(root, file)
-            mem = 10 ** len(str(os.stat(correct_file).st_size))
+            mem = 10 ** (len(str(os.stat(correct_file).st_size)) - 1)
             file_extend = os.path.splitext(file)[-1]
             count, extends = size.get(mem, (0, set()))
 

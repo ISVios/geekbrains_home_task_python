@@ -29,7 +29,7 @@ def scan_mem_recursion(pth):
 
             if os.path.isfile(node):
 
-                mem = 10 ** len(str(os.stat(node).st_size))
+                mem = 10 ** (len(str(os.stat(node).st_size)) - 1)
                 size[mem] = size.get(mem, 0) + 1
             elif os.path.isdir(node):
                 scan_mem(os.path.join(pth, node))
