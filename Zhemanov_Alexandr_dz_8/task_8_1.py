@@ -6,13 +6,13 @@ import re
 
 
 VALID_RE = re.compile(
-    r"(?P<username>([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+)@(?P<domain>[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+)")
+    r"(?P<username>[a-zA-Z0-9\.\-\_]+)@(?P<domain>[a-zA-Z0-9\.\-\_]+)")
 
 
 def email_parse(email):
     """ validation of email """
     try:
-        test = list(map(lambda x: x.groupdict(), VALID_RE.finditer(email)))
-        print(test[0])
+        test = map(lambda x: x.groupdict(), VALID_RE.finditer(email))
+        print(test.__next__())
     except:
         raise ValueError from ValueError
