@@ -2,14 +2,32 @@
 
 
 from abc import ABC
-from enum import Enum
+
+# Exceptions
+
+
+class StoreExcept(Exception):
+    pass
+
+
+class EmptyStore(StoreExcept):
+    pass
+
+
+class WrongReq(StoreExcept):
+    pass
+
+
+class StrongFilter(StoreExcept):
+    pass
+
+# !Exceptions
 
 
 class Store:
-    __ID:int = 0
-    __single: 'Store'
-    __store_lst: list['Equip']
-    __logs: list['Log']
+    __ID: int = 0
+    __single = None
+    __store_lst: list['Equip'] = []
 
     def __new__(cls):
 
@@ -19,154 +37,153 @@ class Store:
         return cls.__single
 
     @classmethod
-    def add_equip(cls, user: 'StoreUser', *equips: 'Equip') -> list['Log']:
-
-
-        if not user.is_login():
-            raise StoreUserError("user not login in store")
-
-        logs_out = []
+    def add_equip(cls, *equips: 'Equip'):
         for equip in equips:
+            equip.equip_id = cls.__ID
+            cls.__ID += 1
             cls.__store_lst.append(equip)
-            # Todo: append log
-            log = Log()
-            log.oper_type = StorePriv.ADD
-            log.equip_id = equip.equip_id
-            logs_out.append(log)
-            cls.__logs.append(log)
-
-
-        return logs_out[:]
+            print(f"add {type(equip)} to store")
 
     @classmethod
-    def del_equip(cls, user: 'StoreUser', *equips: 'Equip') -> list['Log']:
-        return []
+    def filter_equip(cls, flt: 'EquipFilter') -> list['Equip']:
+
+        if len(cls.__store_lst) == 0:
+            raise EmptyStore()
+
+        res = filter(lambda x: (type (x) is flt.equip_type), cls.__store_lst)
+
+        # filter free equip
+        res = filter(lambda x: x.user == "", res)
+
+        for attr_flt in flt.attr_flts:
+            res = filter(attr_flt, res)
+
+        res = list(res)
+        length = len(res)
+
+        if length == 0 or length < flt.count:
+            raise StrongFilter()
+
+        if flt.count == 0:
+            return list(res)
+
+        return res[:flt.count]
 
     @classmethod
-    def req_to(cls, user: 'StoreUser', equip_filter: list['EquipFilter']) -> 'StoreReq':
-        return StoreReq()
+    def applue_req(cls, user_name: str, *equips: 'Equip'):
 
-    @classmethod
-    def applue_req(cls, req: 'StoreReq') -> list['Log']:
-        return []
-
-    @classmethod
-    def get_logs(cls, frm=None, to=None) -> list['Log']:
-        return []
+        for equip in cls.__store_lst:
+            if equip in equips:
+                equip.user = user_name
 
 
 class EquipFilter:
-    equip_type = None
-    flt_find: list
+    equip_type: 'type'
+    count: int = 0
+    attr_flts: list = []
 
-    def __init__(self, equip_type, *filts) -> None:
+    def __init__(self, equip_type, *filts, **kwargs) -> None:
         self.equip_type = equip_type
-        self.flt_find = list(filts)
-
-
-class StorePriv(Enum):
-    ADD = 0
-    DEL = 1
-    REQ = 2
-    APP_REQ = 3
-    BACK = 4
-    ALL_LOG = 5
-    USER_LOG = 6
-
-    @staticmethod
-    def grop(group_name: str) -> set['StorePriv']:
-        if group_name == "admin":
-            return set([
-                StorePriv.ADD, StorePriv.DEL, StorePriv.REQ,
-                StorePriv.APP_REQ, StorePriv.BACK, StorePriv.ALL_LOG])
-        elif group_name == "woker":
-            return set([
-                StorePriv.ADD, StorePriv.DEL,
-                StorePriv.APP_REQ, StorePriv.BACK, StorePriv.ALL_LOG])
-        elif group_name == "company":
-            return set([
-                StorePriv.ADD, StorePriv.DEL,
-                StorePriv.BACK, StorePriv.ALL_LOG])
-        else:
-            return set()
-
-
-class StoreReq:
-    ok: dict
-    fail: dict
-
-
-class StoreUser(object):
-    __login_name: str
-    __priv: set['StorePriv'] = set()
-    # Todo: hide in hash
-    __passwd: str
-    __contr_protect = object()
-
-    @classmethod
-    def login(cls, login_: str = "anymous", passwd: str = ""):
-        return StoreUser(cls.__contr_protect, login_, passwd)
-    
-    def login_name(self):
-        return self.login_name()
-
-    def is_login(self) -> bool:
-        return self.__login_name != "" and self.__passwd != ""
-
-    def can_do(self, priv: 'StorePriv') ->  bool:
-        return priv in self.__priv
-
-    def __init__(self, prt, login_, passwd) -> None:
-
-        assert(prt == StoreUser.__contr_protect), "Please login user by StoreUser.login"
-
-        # image login:password -> priv
-        # admin:nimda -> full priv
-        # anymous: -> can't login
-        # store_worker:w0R3R -> Add and Del Equip + show all logs
-        # some_company:coolCompany123 -> ony req and back + show only self logs
-
-        image = {
-
-            "admin": {"psw": "nimda", "grop": "admin"},
-            "store_worker": {"psw": "w0R3R", "grop": "worker"},
-            "company": {"psw": "coolCompany123", "grop": "company"},
-
-        }
-
-        if image.get(login_):
-            if image[login_]["psw"] == passwd:
-                self.__login_name = login_
-                # Todo : hash
-                self.__passwd = passwd
-
-                # set priv
-                self.__priv = StorePriv.grop(image[login_]["grop"])
-
-            else:
-                raise StoreUserError("login or error incorrect")
-        else:
-            raise StoreUserError("login or error incorrect")
-
-
-class StoreExcept(Exception):
-    pass
-
-
-class StoreUserError(StoreExcept):
-    pass
-
-
-class Log:
-    equip_id: int
-    oper_type: 'StorePriv'
-    date_time: None
-    correct: bool
+        self.count = kwargs.get("count", 0)
+        self.attr_flts = list(filts)
 
 
 class Equip(ABC):
-    equip_id: int
+    __equip_id: int = -1
+    create_by: str = ""
+    user: str = ""
+
+    @property
+    def equip_id(self):
+        return self.__equip_id
+
+    @equip_id.setter
+    def equip_id(self, id_):
+        if self.__equip_id == -1:
+            self.__equip_id = id_
 
 
-class OfficeEquip(Equip):
-    pass
+class Printer(Equip):
+    ink: bool = False
+    print_size: list[str] = []
+
+
+class Shrader(Equip):
+    page_size: list[str] = []
+
+
+class Scanner(Equip):
+    scan_size: list[str] = []
+
+
+class Copper(Printer, Scanner):
+    page_in_try: int = 0
+
+
+def main():
+    store = Store()
+
+    # 3 printers
+
+    p = [Printer() for _ in range(3)]
+
+    p[0].create_by = "Sony"
+    p[0].ink = True
+    p[0].print_size.append("A4")
+    p[0].print_size.append("A3")
+
+    p[1].create_by = "Epson"
+    p[1].ink = True
+    p[1].print_size.append("A4")
+
+    p[2].create_by = "Cannon"
+    p[2].ink = False
+    p[2].print_size.append("A3")
+
+    # 1 Scanner
+
+    s = Scanner()
+
+    s.create_by = "Epson"
+    s.scan_size.append("A4")
+
+    # 2 Copper
+
+    c = [Copper() for _ in range(2)]
+
+    c[0].create_by = "Xerox"
+    c[0].ink = True
+    c[0].print_size.append("A4")
+    c[0].scan_size.append("A3")
+    c[0].page_in_try = 300
+
+    c[1].create_by = "Xerox"
+    c[1].ink = True
+    c[1].print_size.append("A3")
+    c[1].scan_size.append("A4")
+    c[1].page_in_try = 300
+
+    try:
+        store.filter_equip(EquipFilter(Printer))
+    except EmptyStore:
+        print("Store is empty")
+
+    store.add_equip(*c)
+    store.add_equip(*p, s)
+
+    try:
+        print(store.filter_equip(EquipFilter(Printer, count=10)))
+    except StrongFilter:
+        print("Filter is strong")
+    
+    try:
+        req = store.filter_equip(EquipFilter(Printer, lambda x: x.ink == True, count=1))
+        print(*req)
+        store.applue_req("company", *req)
+        print(store.filter_equip(EquipFilter(Copper, lambda x: "A3" in x.scan_size)))
+    except StrongFilter:
+        print("Filter is strong")
+
+
+if __name__ == "__main__":
+    main()
